@@ -1,0 +1,206 @@
+<html>
+
+<head>
+	<title>Bus Ticket Booking</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.4/angular.min.js"></script>
+	<script src="busjs.js"></script>
+	<link rel="stylesheet" href="style.css">
+	<script>
+		function checkNumber(event) {
+			var asciiCode = (event.which) ? event.which : event.keyCode;
+			if (asciiCode >= 48 && asciiCode <= 57) {
+				return true;
+			}
+		}
+	</script>
+</head>
+
+<body ng-app="busApp" ng-controller="busController" ng-cloak>
+
+	<div class="form-group" style="float: right;">
+		<div style="display: inline-block">
+			<button class="btn btn-info" ng-click="searchBody = true">Search Buses</button>
+		</div>
+		<div style="display: inline-block">
+			<button class="btn btn-info" ng-click="searchBody = false">Show Tickets</button>
+		</div>
+	</div>
+
+	<div ng-show="searchBody">
+		<div class="container-fluid" style="padding-left: 140px;">
+			<div>
+				<h3 style="color: #5600ff;">Search Bus</h3>
+			</div>
+			<div style="float: right;color: green" ng-bind="successMsg"></div>
+
+			<form class="form-horizontal" action="#" name="busForm" novalidate>
+				<div class="form-group">
+					<label class="control-label col-sm-2">Source:</label>
+					<div class="col-sm-3">
+						<input type="text" class="form-control" ng-model="source" placeholder="Enter source" required>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-sm-2">Destination:</label>
+					<div class="col-sm-3">
+						<input type="text" class="form-control" ng-model="destination" placeholder="Enter destination" required>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-sm-2">Journey Date:</label>
+					<div class="col-sm-3">
+						<input type="text" class="form-control" ng-model="journeydate" placeholder="dd/mm/yyyy">
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-offset-2 col-sm-10">
+						<button class="btn btn-info" ng-click="getBusDetails()" ng-disabled="busForm.$invalid">Search</button>
+					</div>
+				</div>
+			</form>
+		</div>
+		<div class="container">
+			<h4 style="color:#ff760096">Bus Details</h4>
+			<table class="table table-bordered table-striped" ng-if="searchResult.length > 0">
+				<thead>
+					<tr>
+						<th>Bus Name</th>
+						<th>Source</th>
+						<th>Destination</th>
+						<th>Departure</th>
+						<th>Arrival</th>
+						<th>Duration</th>
+						<th>Fare</th>
+						<th>Availability</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="b in searchResult">
+						<td>{{b.BusName}}</td>
+						<td>{{b.Source}}</td>
+						<td>{{b.Destination}}</td>
+						<td>{{b.Departure}}</td>
+						<td>{{b.Arrival}}</td>
+						<td>{{b.Duration}}</td>
+						<td>{{b.Fare}}</td>
+						<td>{{b.Availability}}</td>
+						<td>
+							<button type="button" class="btn btn-success" data-toggle="modal" data-target="#registerUser" ng-click="addUser(b.BusId, b.Availability)"
+							 ng-disabled="b.Availability == 0">Book</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div ng-bind="errorMsg" style="color:red"></div>
+		</div>
+	</div>
+
+	<div ng-show="!searchBody">
+		<div class="container-fluid" style="padding-left: 56px;padding-top: 22px;">
+			<h4 style="color: #1102f1;">Ticket Details</h4>
+			<div id="card" ng-repeat="p in passengers" ng-if="passengers.length > 0">
+				<div>
+					<span style="font-size: 18px;">{{p.fullname}}</span>
+					<span id="age">{{p.age}}</span> <span id="sex">{{p.gender}}</span>
+				</div>
+				<div>
+					<span id="journey">{{p.Source}} <span id="arrow" class="fa fa-long-arrow-right"></span> {{p.Destination}}</span>
+				</div>
+				<div>
+					<span style="padding-right:44px;">Bus</span> <span>: {{p.BusName}}</span>
+				</div>
+				<div>
+					<span style="padding-right:10px;">Departure</span><span>: {{p.Departure}}</span>
+				</div>
+				<div>
+					<span style="padding-right:33px;">Arrival</span><span>: {{p.Arrival}}</span>
+				</div>
+				<div>
+					<span style="padding-right:20px;">Duration</span><span>: {{p.Duration}}</span>
+				</div>
+				<div>
+					<span style="padding-right:44px;">Fare</span><span>: <span class="fa fa-inr"></span>{{p.Fare}}</span>
+				</div>
+				<div>
+					<span style="padding-right:25px;">Contact</span><span>: {{p.phone}}</span>
+				</div>
+			</div>
+			<div ng-if="passengers.length == 0" style="color:red">No Ticket Details Found!</div>
+		</div>
+	</div>
+
+	<div id="registerUser" class="modal fade" role="dialog">
+		<div class="modal-dialog">
+
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Passenger Details</h4>
+				</div>
+				<div class="modal-body">
+					<form name="userForm" novalidate>
+						<div class="form-group" style="padding-bottom:10px;">
+							<label class="control-label col-sm-3">Journey Date:</label>
+							<div class="col-sm-3">
+								<input type="text" class="form-control" ng-model="journeydate" placeholder="dd/mm/yyyy" minlength="10"
+								 maxlength="10" required>
+							</div>
+						</div>
+						<table class="table table-striped" ng-if="searchResult.length > 0">
+							<thead>
+								<tr>
+									<th>Full Name</th>
+									<th>Gender</th>
+									<th>Age</th>
+									<th>Phone</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="n in noOfPassengers">
+									<td>
+										<input type="text" class="form-control" ng-model="ob[$index].fullname" placeholder="full name" required>
+									</td>
+									<td>
+										<select class="form-control" style="width: 94px;" ng-model="ob[$index].gender" required>
+											<option value="">select</option>
+											<option value="M">Male</option>
+											<option value="F">Female</option>
+										</select>
+									</td>
+									<td>
+										<input type="text" class="form-control" ng-model="ob[$index].age" placeholder="age" onkeydown="return checkNumber(event)"
+										 minlength="1" maxlength="2" required>
+									</td>
+									<td>
+										<input type="text" class="form-control" ng-model="ob[$index].phone" placeholder="phone" onkeydown="return checkNumber(event)"
+										 minlength="10" maxlength="10" required>
+									</td>
+									<td>
+										<a href="#"><span class="glyphicon glyphicon-remove" ng-if="$index > 0" ng-click="removePassenger($index)"></span></a>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<div style="float: left;width: 114px;">
+							<a href="" style="text-align: left;" ng-click="addPassenger()" ng-hide="noOfPassengers.length == availableSeats"><span
+								 class="glyphicon glyphicon-plus"></span>Add Passenger</a>
+						</div>
+						<div style="text-align: right;">
+							<button type="button" class="btn btn-success" ng-click="bookTicket()" data-dismiss="modal" ng-disabled="userForm.$invalid">Submit</button>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal" id="closeModal" ng-click="resetPassengers()">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

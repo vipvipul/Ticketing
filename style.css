@@ -1,0 +1,33 @@
+#card{
+	width: 286px;
+	border: 3px outset #b5afe4;
+	height: 192px;
+	border-radius: 9px;
+	background-color: #fffcf3;
+	margin-left: 26px;
+	margin-bottom: 7px;
+	padding-left: 10px;
+	padding-top: 7px;
+	display: inline-block;
+}
+#age{
+	padding-left: 23px;
+	color: #ca2020;
+	font-weight: 700;
+}
+#sex{
+	padding-left: 3px;
+	color: #ca2020;
+	font-weight: 700;
+}
+#arrow{
+    font-size: 24px;
+	padding-left: 7px;
+	padding-right: 7px;
+	top: 4px;
+	position: relative;
+}
+#journey{
+	font-size: 16px;
+	color: #8b008b;
+}
